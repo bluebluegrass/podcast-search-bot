@@ -33,7 +33,9 @@ const handler = async (req, res) => {
     const episodes = data.results.slice(0, 3);
 
     if (!episodes.length) {
-      return res.status(200).json({ reply: "未找到相关的播客，请尝试其他关键词。" });
+      return res.status(200).json({
+        reply: "未找到相关的播客。建议尝试更简短或不同的关键词，例如“焦虑”、“工作”、“内耗”。",
+      });
     }
 
     const summariesText = episodes
@@ -42,7 +44,7 @@ const handler = async (req, res) => {
 
     // Step 2: Call OpenAI to summarize
     const gptResponse = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
@@ -50,10 +52,11 @@ const handler = async (req, res) => {
         },
         {
           role: "user",
-          content: `以下是与“${query}”相关的播客，请为每一集写一句中文推荐理由，并附上标题：\n\n${summariesText}`,
+          content: `以下是与“${query}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题：\n\n${summariesText}`,
         },
       ],
       temperature: 0.7,
+      max_tokens: 400,
     });
 
     const reply = gptResponse.choices[0].message.content;
