@@ -58,7 +58,12 @@ const handler = async (req, res) => {
     }
 
     const summariesText = episodes
-      .map((ep, idx) => `${idx + 1}. 标题: ${ep.title_original}\n简介: ${ep.description_original}`)
+      .map((ep, idx) => {
+        const title = ep.title_original;
+        const desc = ep.description_original;
+        const link = ep.listennotes_url;
+        return `${idx + 1}. 标题: ${title}\n简介: ${desc}\n链接: ${link}`;
+      })
       .join("\n\n");
 
     // Step 3: Call GPT to summarize results
@@ -71,7 +76,7 @@ const handler = async (req, res) => {
         },
         {
           role: "user",
-          content: `以下是与“${keywordQuery}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题：\n\n${summariesText}`,
+          content: `以下是与“${keywordQuery}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题和链接：\n\n${summariesText}`,
         },
       ],
       temperature: 0.7,
@@ -80,6 +85,7 @@ const handler = async (req, res) => {
 
     const reply = gptResponse.choices[0].message.content;
     res.status(200).json({ reply: reply.toString() });
+
   } catch (err) {
     console.error("Error in API handler:", err);
     res.status(500).json({ error: "Internal Server Error" });
