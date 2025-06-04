@@ -79,7 +79,7 @@ const handler = async (req, res) => {
     });
 
     const reply = gptResponse.choices[0].message.content;
-    res.status(200).json({ reply });
+    res.status(200).json({ reply: reply.toString() });
   } catch (err) {
     console.error("Error in API handler:", err);
     res.status(500).json({ error: "Internal Server Error" });
