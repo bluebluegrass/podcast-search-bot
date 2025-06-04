@@ -84,7 +84,7 @@ const handler = async (req, res) => {
     });
 
     const reply = gptResponse.choices[0].message.content;
-    res.status(200).json({ reply });
+    res.status(200).json({ data: { reply } });
 
 
   } catch (err) {
