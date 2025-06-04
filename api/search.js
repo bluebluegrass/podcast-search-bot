@@ -17,10 +17,29 @@ const handler = async (req, res) => {
   }
 
   try {
-    // Step 1: Call ListenNotes
+    // Step 1: Use GPT to extract search keywords
+    const extractResponse = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: "你是一个播客搜索助手，请从用户的问题中提取2到4个关键词，用空格分隔，尽可能简洁准确。不要解释，只输出关键词。"
+        },
+        {
+          role: "user",
+          content: query
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 30
+    });
+
+    const keywordQuery = extractResponse.choices[0].message.content.trim();
+
+    // Step 2: Call ListenNotes
     const searchRes = await fetch(
       `https://listen-api.listennotes.com/api/v2/search?q=${encodeURIComponent(
-        query
+        keywordQuery
       )}&language=Chinese&type=episode&len_min=5&len_max=60&sort_by_date=0`,
       {
         headers: {
@@ -42,7 +61,7 @@ const handler = async (req, res) => {
       .map((ep, idx) => `${idx + 1}. 标题: ${ep.title_original}\n简介: ${ep.description_original}`)
       .join("\n\n");
 
-    // Step 2: Call OpenAI to summarize
+    // Step 3: Call GPT to summarize results
     const gptResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
@@ -52,7 +71,7 @@ const handler = async (req, res) => {
         },
         {
           role: "user",
-          content: `以下是与“${query}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题：\n\n${summariesText}`,
+          content: `以下是与“${keywordQuery}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题：\n\n${summariesText}`,
         },
       ],
       temperature: 0.7,
