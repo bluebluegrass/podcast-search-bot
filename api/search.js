@@ -62,21 +62,21 @@ const handler = async (req, res) => {
         const title = ep.title_original;
         const desc = ep.description_original;
         const link = ep.listennotes_url;
-        return `${idx + 1}. 标题: ${title}\n简介: ${desc}\n链接: ${link}`;
+        return `${idx + 1}. 标题：${title}\n推荐理由：${desc.slice(0, 60).replace(/\n/g, " ")}\n收听链接：${link}`;
       })
       .join("\n\n");
 
-    // Step 3: Call GPT to summarize and format as markdown
+    // Step 3: Call GPT to write short summary (plain text, no markdown)
     const gptResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "你是一个中文播客推荐助手，请将推荐结果格式化为 Markdown，包含标题（加粗）、一句推荐语（30字内），以及带链接的“点击收听”。每条推荐用 emoji 开头。"
+          content: "你是一个中文播客推荐助手，请对每条播客写一句不超过30字的推荐理由，格式为：标题、推荐理由、收听链接，使用纯文本格式。不要使用任何 markdown 或特殊符号。"
         },
         {
           role: "user",
-          content: `以下是与“${keywordQuery}”相关的播客，请为每一集写一句不超过30字的中文推荐理由，并附上标题和链接：\n\n${summariesText}`,
+          content: `以下是与“${keywordQuery}”相关的播客，请为每一集写一句中文推荐理由，并保留标题和链接：\n\n${summariesText}`,
         },
       ],
       temperature: 0.7,
