@@ -66,13 +66,13 @@ const handler = async (req, res) => {
       })
       .join("\n\n");
 
-    // Step 3: Call GPT to summarize results
+    // Step 3: Call GPT to summarize and format as markdown
     const gptResponse = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "你是一个中文播客推荐助手，会根据用户的提问，对播客内容进行总结推荐。",
+          content: "你是一个中文播客推荐助手，请将推荐结果格式化为 Markdown，包含标题（加粗）、一句推荐语（30字内），以及带链接的“点击收听”。每条推荐用 emoji 开头。"
         },
         {
           role: "user",
@@ -80,7 +80,7 @@ const handler = async (req, res) => {
         },
       ],
       temperature: 0.7,
-      max_tokens: 400,
+      max_tokens: 500,
     });
 
     const reply = gptResponse.choices[0].message.content;
