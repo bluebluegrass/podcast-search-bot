@@ -1,5 +1,5 @@
 // /api/search.js
-import { Configuration, OpenAIApi } from "openai";
+const { Configuration, OpenAIApi } = require("openai");
 
 const LISTENNOTES_API_KEY = process.env.LISTENNOTES_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
