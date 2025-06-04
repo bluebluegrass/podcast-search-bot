@@ -1,4 +1,3 @@
-// /api/search.js
 const OpenAI = require("openai");
 
 const LISTENNOTES_API_KEY = process.env.LISTENNOTES_API_KEY;
@@ -53,7 +52,9 @@ const handler = async (req, res) => {
 
     if (!episodes.length) {
       return res.status(200).json({
-        reply: "未找到相关的播客。建议尝试更简短或不同的关键词，例如“焦虑”、“工作”、“内耗”。",
+        data: {
+          reply: "未找到相关的播客。建议尝试更简短或不同的关键词，例如“焦虑”、“工作”、“内耗”。",
+        }
       });
     }
 
@@ -85,7 +86,6 @@ const handler = async (req, res) => {
 
     const reply = gptResponse.choices[0].message.content;
     res.status(200).json({ data: { reply } });
-
 
   } catch (err) {
     console.error("Error in API handler:", err);
