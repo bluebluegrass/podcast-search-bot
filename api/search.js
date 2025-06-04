@@ -84,7 +84,8 @@ const handler = async (req, res) => {
     });
 
     const reply = gptResponse.choices[0].message.content;
-    res.status(200).json({ reply: reply.toString() });
+    res.status(200).json({ reply });
+
 
   } catch (err) {
     console.error("Error in API handler:", err);
